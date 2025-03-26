@@ -22,7 +22,6 @@ export const useAuthStore = create((set, get) => ({
 
       get().connectSocket();
     } catch (error) {
-      console.log("Not authenticated");
       set({ authUser: null });
       get().disconnectSocket();
     } finally {
