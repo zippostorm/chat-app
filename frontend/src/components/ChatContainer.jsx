@@ -17,7 +17,10 @@ const ChatContainer = () => {
   }, [selectedUser._id, getMessages]);
 
   useEffect(() => {
-    messagesEndRef.current?.scrollIntoView({ behavior: "auto" });
+    const timer = setTimeout(() => {
+      messagesEndRef.current?.scrollIntoView({ behavior: "auto" });
+    }, 50);
+    return () => clearTimeout(timer);
   }, [messages]);
 
   if (isMessagesLoading) {
