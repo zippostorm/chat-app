@@ -67,26 +67,34 @@ export const useChatStore = create((set, get) => ({
 
     const socket = useAuthStore.getState().socket;
 
-    socket.on("newMessage", async (newMessage) => {
-      set((state) => ({
-        messages: [...state.messages, newMessage],
-      }));
+    socket.on("newMessage", (newMessage) => {
+      // Добавляем новое сообщение только если оно пришло от текущего собеседника
+      if (
+        newMessage.senderId === selectedUser._id ||
+        newMessage.receiverId === selectedUser._id
+      ) {
+        set((state) => ({
+          messages: [...state.messages, newMessage],
+        }));
 
-      // Если сообщение пришло от текущего собеседника, отправляем запрос на его пометку как прочитанное
-      if (newMessage.senderId === selectedUser._id) {
-        try {
-          await axiosInstance.post(`/message/read/${newMessage.senderId}`);
-          set((state) => ({
-            unreadMessageCounts: {
-              ...state.unreadMessageCounts,
-              [newMessage.senderId]: 0,
-            },
-          }));
-        } catch (error) {
-          console.error(
-            "Ошибка при пометке сообщения как прочитанного:",
-            error
-          );
+        // Если сообщение пришло от текущего собеседника, помечаем его как прочитанное
+        if (newMessage.senderId === selectedUser._id) {
+          axiosInstance
+            .post(`/message/read/${newMessage.senderId}`)
+            .then(() => {
+              set((state) => ({
+                unreadMessageCounts: {
+                  ...state.unreadMessageCounts,
+                  [newMessage.senderId]: 0,
+                },
+              }));
+            })
+            .catch((error) => {
+              console.error(
+                "Error marking message as read in subscribeToMessages:",
+                error
+              );
+            });
         }
       }
     });
