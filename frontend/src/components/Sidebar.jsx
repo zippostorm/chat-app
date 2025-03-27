@@ -5,8 +5,15 @@ import SidebarSkeleton from "./skeletons/SidebarSkeleton";
 import { Users } from "lucide-react";
 
 const Sidebar = () => {
-  const { getUsers, users, selectedUser, setSelectedUser, isUsersLoading } =
-    useChatStore();
+  const {
+    getUsers,
+    users,
+    selectedUser,
+    setSelectedUser,
+    isUsersLoading,
+    unreadMessageCounts,
+    checkCountMessage,
+  } = useChatStore();
 
   const { onlineUsers } = useAuthStore();
 
@@ -15,6 +22,10 @@ const Sidebar = () => {
   useEffect(() => {
     getUsers();
   }, [getUsers]);
+
+  useEffect(() => {
+    checkCountMessage(); // Подписываемся на обновление непрочитанных сообщений
+  }, [checkCountMessage]);
 
   const filteredUsers = showOnlineOnly
     ? users.filter((user) => onlineUsers.includes(user._id))
@@ -54,7 +65,7 @@ const Sidebar = () => {
             key={user._id}
             onClick={() => setSelectedUser(user)}
             className={`
-              w-full p-3 flex items-center gap-3
+              w-full relative p-3 flex items-center gap-3
               hover:bg-base-300 transition-colors
               ${
                 selectedUser?._id === user._id
@@ -84,6 +95,12 @@ const Sidebar = () => {
                 {onlineUsers.includes(user._id) ? "Online" : "Offline"}
               </div>
             </div>
+
+            {unreadMessageCounts[user._id] > 0 && (
+              <div className="absolute top-2 left-11  bg-primary text-white rounded-full px-2 py-0.5 text-sm">
+                {unreadMessageCounts[user._id]}
+              </div>
+            )}
           </button>
         ))}
 

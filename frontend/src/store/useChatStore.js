@@ -6,6 +6,7 @@ import { useAuthStore } from "./useAuthStore";
 export const useChatStore = create((set, get) => ({
   messages: [],
   users: [],
+  unreadMessageCounts: {},
 
   selectedUser: null,
 
@@ -17,7 +18,10 @@ export const useChatStore = create((set, get) => ({
     set({ isUsersLoading: true });
     try {
       const res = await axiosInstance.get("/message/users");
-      set({ users: res.data });
+      set({
+        users: res.data.users,
+        unreadMessageCounts: res.data.unreadMessageCounts,
+      });
     } catch (error) {
       toast.error(error.response.data.message);
     } finally {
@@ -29,7 +33,10 @@ export const useChatStore = create((set, get) => ({
     set({ isMessagesLoading: true });
     try {
       const res = await axiosInstance.get(`/message/${userId}`);
-      set({ messages: res.data });
+      set((state) => ({
+        messages: res.data,
+        unreadMessageCounts: { ...state.unreadMessageCounts, [userId]: 0 },
+      }));
     } catch (error) {
       toast.error(error.response.data.message);
     } finally {
@@ -62,7 +69,21 @@ export const useChatStore = create((set, get) => ({
 
     socket.on("newMessage", (newMessage) => {
       if (newMessage.senderId !== selectedUser._id) return;
-      set({ messages: [...get().messages, newMessage] });
+
+      set((state) => ({
+        messages: [...state.messages, newMessage],
+        unreadMessageCounts: {
+          ...state.unreadMessageCounts,
+          [selectedUser._id]: 0,
+        },
+      }));
+    });
+  },
+
+  checkCountMessage: () => {
+    const socket = useAuthStore.getState().socket;
+    socket.on("updateUnreadCount", () => {
+      get().getUsers(); // Обновляем список пользователей (и непрочитанные сообщения)
     });
   },
 

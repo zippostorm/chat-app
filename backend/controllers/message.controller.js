@@ -6,11 +6,22 @@ import { getReceiverSocketId, io } from "../lib/socket.js";
 export const getUsersForSidebar = async (req, res) => {
   try {
     const loggedInUserId = req.user._id;
-    const filteredUsers = await User.find({
-      _id: { $ne: loggedInUserId },
-    }).select("-password");
+    const users = await User.find({ _id: { $ne: loggedInUserId } }).select(
+      "-password"
+    );
 
-    res.status(200).json(filteredUsers);
+    // Подсчет количества непрочитанных сообщений
+    const unreadCounts = await Message.aggregate([
+      { $match: { receiverId: loggedInUserId, isRead: false } },
+      { $group: { _id: "$senderId", count: { $sum: 1 } } },
+    ]);
+
+    const unreadMessageCounts = unreadCounts.reduce((acc, { _id, count }) => {
+      acc[_id] = count;
+      return acc;
+    }, {});
+
+    res.status(200).json({ users, unreadMessageCounts });
   } catch (error) {
     console.log("Error in getUsersForSidebar controller: ", error.message);
     res.status(500).json({ message: "Internal Server Error" });
@@ -28,6 +39,13 @@ export const getMessages = async (req, res) => {
         { senderId: userToChatId, receiverId: myId },
       ],
     });
+
+    await Message.updateMany(
+      { senderId: userToChatId, receiverId: myId, isRead: false },
+      { $set: { isRead: true } }
+    );
+
+    io.to(getReceiverSocketId(userToChatId)).emit("updateUnreadCount");
 
     res.status(200).json(messages);
   } catch (error) {
@@ -63,6 +81,7 @@ export const sendMessage = async (req, res) => {
     const receiverSocketId = getReceiverSocketId(receiverId);
     if (receiverSocketId) {
       io.to(receiverSocketId).emit("newMessage", newMessage);
+      io.to(receiverSocketId).emit("updateUnreadCount", { senderId });
     }
 
     res.status(201).json(newMessage);
