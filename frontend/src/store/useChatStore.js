@@ -67,23 +67,41 @@ export const useChatStore = create((set, get) => ({
 
     const socket = useAuthStore.getState().socket;
 
-    socket.on("newMessage", (newMessage) => {
-      if (newMessage.senderId !== selectedUser._id) return;
-
+    socket.on("newMessage", async (newMessage) => {
       set((state) => ({
         messages: [...state.messages, newMessage],
-        unreadMessageCounts: {
-          ...state.unreadMessageCounts,
-          [selectedUser._id]: 0,
-        },
       }));
+
+      // Если сообщение пришло от текущего собеседника, отправляем запрос на его пометку как прочитанное
+      if (newMessage.senderId === selectedUser._id) {
+        try {
+          await axiosInstance.post(`/message/read/${newMessage.senderId}`);
+          set((state) => ({
+            unreadMessageCounts: {
+              ...state.unreadMessageCounts,
+              [newMessage.senderId]: 0,
+            },
+          }));
+        } catch (error) {
+          console.error(
+            "Ошибка при пометке сообщения как прочитанного:",
+            error
+          );
+        }
+      }
     });
   },
 
   checkCountMessage: () => {
     const socket = useAuthStore.getState().socket;
-    socket.on("updateUnreadCount", () => {
-      get().getUsers(); // Обновляем список пользователей (и непрочитанные сообщения)
+
+    socket.on("updateUnreadCount", ({ senderId }) => {
+      set((state) => ({
+        unreadMessageCounts: {
+          ...state.unreadMessageCounts,
+          [senderId]: (state.unreadMessageCounts[senderId] || 0) + 1,
+        },
+      }));
     });
   },
 
