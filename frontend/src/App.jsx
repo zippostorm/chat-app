@@ -7,6 +7,7 @@ import SignUpPage from "./pages/SignUpPage";
 import LoginPage from "./pages/LoginPage";
 import SettingsPage from "./pages/SettingsPage";
 import ProfilePage from "./pages/ProfilePage";
+import ChatContainer from "./components/ChatContainer";
 
 import { useAuthStore } from "./store/useAuthStore";
 
@@ -35,6 +36,10 @@ const App = () => {
         <Route
           path="/"
           element={authUser ? <HomePage /> : <Navigate to="/login" />}
+        />
+        <Route
+          path="/chat"
+          element={authUser ? <ChatContainer /> : <Navigate to="/login" />}
         />
         <Route
           path="/signup"

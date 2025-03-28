@@ -1,11 +1,16 @@
-import React from "react";
+import React, { useEffect } from "react";
 import { useChatStore } from "../store/useChatStore";
 import Sidebar from "../components/Sidebar";
 import NoChatSelected from "../components/NoChatSelected";
 import ChatContainer from "../components/ChatContainer";
 
 const HomePage = () => {
-  const { selectedUser } = useChatStore();
+  const { selectedUser, setSelectedUser } = useChatStore();
+  console.log(selectedUser);
+
+  useEffect(() => {
+    setSelectedUser(null);
+  }, [setSelectedUser]);
 
   return (
     <div className="min-h-screen bg-base-200">

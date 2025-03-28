@@ -3,6 +3,7 @@ import { useChatStore } from "../store/useChatStore";
 import { useAuthStore } from "../store/useAuthStore";
 import SidebarSkeleton from "./skeletons/SidebarSkeleton";
 import { Users } from "lucide-react";
+import { useNavigate } from "react-router-dom";
 
 const Sidebar = () => {
   const {
@@ -16,6 +17,8 @@ const Sidebar = () => {
   } = useChatStore();
 
   const { onlineUsers } = useAuthStore();
+
+  const navigate = useNavigate();
 
   const [showOnlineOnly, setShowOnlineOnly] = useState(false);
 
@@ -63,7 +66,12 @@ const Sidebar = () => {
         {filteredUsers.map((user) => (
           <button
             key={user._id}
-            onClick={() => setSelectedUser(user)}
+            onClick={() => {
+              setSelectedUser(user);
+              if (window.innerWidth <= 767) {
+                navigate("/chat");
+              }
+            }}
             className={`
               w-full relative p-3 flex items-center gap-3
               hover:bg-base-300 transition-colors
@@ -88,7 +96,7 @@ const Sidebar = () => {
               )}
             </div>
 
-            <div className="hidden sm:block text-left min-w-0">
+            <div className="text-left min-w-0">
               <div className="font-medium truncate">{user.fullName}</div>
               <div className="text-sm text-zinc-400">
                 {onlineUsers.includes(user._id) ? "Online" : "Offline"}
