@@ -8,10 +8,6 @@ const HomePage = () => {
   const { selectedUser, setSelectedUser } = useChatStore();
   console.log(selectedUser);
 
-  useEffect(() => {
-    setSelectedUser(null);
-  }, [setSelectedUser]);
-
   return (
     <div className="min-h-screen bg-base-200">
       <div className="flex items-center justify-center pt-20 px-4">

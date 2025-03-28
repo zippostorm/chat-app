@@ -2,13 +2,16 @@ import React from "react";
 import { X } from "lucide-react";
 import { useAuthStore } from "../store/useAuthStore";
 import { useChatStore } from "../store/useChatStore";
+import { useNavigate } from "react-router-dom";
 
 const ChatHeader = () => {
   const { selectedUser, setSelectedUser } = useChatStore();
   const { onlineUsers } = useAuthStore();
 
+  const navigate = useNavigate();
+
   return (
-    <div className="p-2.5 border-b border-base-300">
+    <div className="p-2.5 border-b border-base-300 max-md:fixed max-md:w-full max-md:z-30 max-md:bg-base-100">
       <div className="flex items-center justify-between">
         <div className="flex items-center gap-3">
           {/* Avatar */}
@@ -31,7 +34,12 @@ const ChatHeader = () => {
         </div>
 
         {/* Close button */}
-        <button onClick={() => setSelectedUser(null)}>
+        <button
+          onClick={() => {
+            if (window.innerWidth < 768) navigate("/");
+            setTimeout(() => setSelectedUser(null), 50);
+          }}
+        >
           <X />
         </button>
       </div>
