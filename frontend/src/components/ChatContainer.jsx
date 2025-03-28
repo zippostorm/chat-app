@@ -4,8 +4,10 @@ import ChatHeader from "./ChatHeader";
 import MessageInput from "./MessageInput";
 import MessageSkeleton from "./skeletons/MessageSkeleton";
 import { useAuthStore } from "../store/useAuthStore";
+import { useParams } from "react-router-dom";
 
 const ChatContainer = () => {
+  const { userId } = useParams();
   const {
     messages,
     getMessages,
@@ -19,7 +21,7 @@ const ChatContainer = () => {
   const messagesEndRef = useRef(null);
 
   useEffect(() => {
-    getMessages(selectedUser?._id);
+    getMessages(selectedUser?._id || userId);
 
     subscribeToMessages();
 

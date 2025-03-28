@@ -69,7 +69,7 @@ const Sidebar = () => {
             onClick={() => {
               setSelectedUser(user);
               if (window.innerWidth <= 767) {
-                navigate("/chat");
+                navigate(`/chat/${user._id}`);
               }
             }}
             className={`

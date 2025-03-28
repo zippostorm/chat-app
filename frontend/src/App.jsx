@@ -38,7 +38,7 @@ const App = () => {
           element={authUser ? <HomePage /> : <Navigate to="/login" />}
         />
         <Route
-          path="/chat"
+          path="/chat/:userId"
           element={authUser ? <ChatContainer /> : <Navigate to="/login" />}
         />
         <Route
