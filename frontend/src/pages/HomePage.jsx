@@ -6,6 +6,10 @@ import ChatContainer from "../components/ChatContainer";
 
 const HomePage = () => {
   const { selectedUser, setSelectedUser } = useChatStore();
+
+  useEffect(() => {
+    setSelectedUser(null);
+  }, [setSelectedUser]);
   console.log(selectedUser);
 
   return (

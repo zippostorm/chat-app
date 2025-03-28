@@ -19,17 +19,12 @@ const ChatContainer = () => {
   const messagesEndRef = useRef(null);
 
   useEffect(() => {
-    getMessages(selectedUser._id);
+    getMessages(selectedUser?._id);
 
     subscribeToMessages();
 
     return () => unsubscribeFromMessages();
-  }, [
-    selectedUser._id,
-    getMessages,
-    subscribeToMessages,
-    unsubscribeFromMessages,
-  ]);
+  }, [selectedUser, getMessages, subscribeToMessages, unsubscribeFromMessages]);
 
   useEffect(() => {
     const timer = setTimeout(() => {
@@ -66,7 +61,7 @@ const ChatContainer = () => {
                   src={
                     message.senderId === authUser._id
                       ? authUser.profilePic || "/avatar.png"
-                      : selectedUser.profilePic || "/avatar.png"
+                      : selectedUser?.profilePic || "/avatar.png"
                   }
                   alt="Profile pic"
                 />
