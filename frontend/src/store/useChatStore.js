@@ -118,5 +118,15 @@ export const useChatStore = create((set, get) => ({
     socket.off("newMessage");
   },
 
-  setSelectedUser: (selectedUser) => set({ selectedUser }),
+  setSelectedUser: (selectedUser) => {
+    localStorage.setItem("selectedUser", JSON.stringify(selectedUser));
+    set({ selectedUser });
+  },
+
+  getSelectedUser: () => {
+    const storedUser = localStorage.getItem("selectedUser");
+    if (storedUser) {
+      set({ selectedUser: JSON.parse(storedUser) });
+    }
+  },
 }));

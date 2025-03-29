@@ -9,7 +9,9 @@ const HomePage = () => {
 
   useEffect(() => {
     setSelectedUser(null);
+    localStorage.removeItem("selectedUser");
   }, [setSelectedUser]);
+
   console.log(selectedUser);
 
   return (

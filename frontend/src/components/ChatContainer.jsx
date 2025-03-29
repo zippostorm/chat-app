@@ -15,18 +15,22 @@ const ChatContainer = () => {
     selectedUser,
     subscribeToMessages,
     unsubscribeFromMessages,
+    getSelectedUser,
   } = useChatStore();
   const { authUser } = useAuthStore();
 
   const messagesEndRef = useRef(null);
 
   useEffect(() => {
+    getSelectedUser();
     getMessages(selectedUser?._id || userId);
+
+    if (selectedUser?._id !== userId) return;
 
     subscribeToMessages();
 
     return () => unsubscribeFromMessages();
-  }, [selectedUser, getMessages, subscribeToMessages, unsubscribeFromMessages]);
+  }, [getMessages, subscribeToMessages, unsubscribeFromMessages, userId]);
 
   useEffect(() => {
     const timer = setTimeout(() => {
