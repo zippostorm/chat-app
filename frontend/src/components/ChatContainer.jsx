@@ -23,14 +23,17 @@ const ChatContainer = () => {
 
   useEffect(() => {
     getSelectedUser();
-    getMessages(selectedUser?._id || userId);
+  }, [userId]); // Перезапускаем при смене userId
 
-    if (selectedUser?._id !== userId) return;
+  useEffect(() => {
+    if (!selectedUser?._id) return;
+
+    getMessages(selectedUser._id);
 
     subscribeToMessages();
 
     return () => unsubscribeFromMessages();
-  }, [getMessages, subscribeToMessages, unsubscribeFromMessages, userId]);
+  }, [selectedUser, getMessages, subscribeToMessages, unsubscribeFromMessages]);
 
   useEffect(() => {
     const timer = setTimeout(() => {
