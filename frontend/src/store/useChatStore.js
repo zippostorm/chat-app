@@ -29,6 +29,17 @@ export const useChatStore = create((set, get) => ({
     }
   },
 
+  searchUsers: async (searchQuery) => {
+    try {
+      const res = await axiosInstance.post("/message/search", {
+        searchQuery,
+      });
+      set({ users: res.data });
+    } catch (error) {
+      toast.error(error.response.data.message);
+    }
+  },
+
   getMessages: async (userId) => {
     set({ isMessagesLoading: true });
     try {

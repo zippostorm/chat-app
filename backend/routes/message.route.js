@@ -5,6 +5,7 @@ import {
   getMessages,
   sendMessage,
   markMessagesAsRead,
+  searchUsers,
 } from "../controllers/message.controller.js";
 
 const router = express.Router();
@@ -14,5 +15,6 @@ router.get("/:id", protectRoute, getMessages);
 
 router.post("/send/:id", protectRoute, sendMessage);
 router.post("/read/:senderId", protectRoute, markMessagesAsRead);
+router.post("/search", protectRoute, searchUsers);
 
 export default router;

@@ -107,3 +107,20 @@ export const markMessagesAsRead = async (req, res) => {
     res.status(500).json({ message: "Internal Server Error" });
   }
 };
+
+export const searchUsers = async (req, res) => {
+  try {
+    const loggedInUserId = req.user._id;
+    const { searchQuery } = req.body;
+    const filter = { _id: { $ne: loggedInUserId } };
+    if (searchQuery) {
+      filter.fullName = { $regex: searchQuery, $options: "i" }; // Поиск без учета регистра
+    }
+
+    const users = await User.find(filter).select("-password");
+    res.status(200).json(users);
+  } catch (error) {
+    console.log("Error in searchUsers controller: ", error.message);
+    res.status(500).json({ message: "Internal Server Error" });
+  }
+};
